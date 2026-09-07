@@ -447,7 +447,9 @@ export default function Dashboard() {
                   <span className="font-hanzi text-lg font-black text-gold">
                     {s.hanzi}
                   </span>
-                  <p className="mt-1 font-bold">{s.name}</p>
+                  <p className="mt-1 font-bold">
+                    {s.name} HSK {level}
+                  </p>
                   <p className="mt-1 text-sm text-text2">{s.desc}</p>
                   {previewsFor(s.key).length > 0 && (
                     <div className="mt-4 flex flex-col gap-3">

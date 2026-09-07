@@ -171,7 +171,6 @@ export default function Checkout() {
                     >
                       <div className="min-w-0">
                         <p className="truncate text-sm font-semibold">{d.name}</p>
-                        <p className="text-xs text-text3">{d.id}</p>
                       </div>
                       <span className="shrink-0 text-sm font-bold">{formatIDR(d.price)}</span>
                     </div>

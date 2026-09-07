@@ -14,7 +14,9 @@ function discount(opt: PricingOption) {
 
 function TierCard({ opt, level }: { opt: PricingOption; level: number }) {
   const off = discount(opt);
-  const checkoutId = opt.id.replace(/_L\d+$/, `_L${level}`);
+  const hasLevel = /_L\d+$/.test(opt.id);
+  const checkoutId = hasLevel ? opt.id.replace(/_L\d+$/, `_L${level}`) : opt.id;
+  const name = hasLevel ? `${opt.name} HSK ${level}` : opt.name;
   return (
     <motion.div
       initial={{ opacity: 0, y: 24 }}
@@ -46,7 +48,7 @@ function TierCard({ opt, level }: { opt: PricingOption; level: number }) {
         {opt.featured ? "Bundel Rekomendasi" : opt.hanzi}
       </p>
       <div className="mt-3 flex items-center gap-3">
-        <h3 className="text-2xl font-black tracking-tight">{opt.name}</h3>
+        <h3 className="text-2xl font-black tracking-tight">{name}</h3>
         <span className="font-hanzi text-xl font-bold text-gold">{opt.hanzi}</span>
       </div>
       <p className="mt-2 text-sm text-text2">{opt.tagline}</p>
