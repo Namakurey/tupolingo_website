@@ -1,0 +1,33 @@
+{
+  "name": "tupolingo-website",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -H 0.0.0.0",
+    "build": "next build",
+    "start": "next start -H 0.0.0.0",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@insforge/sdk": "^1.5.2",
+    "@radix-ui/react-dialog": "^1.1.14",
+    "@types/three": "^0.185.4",
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.23.6",
+    "lucide-react": "^0.525.0",
+    "next": "14.2.35",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "tailwind-merge": "^3.6.0",
+    "three": "^0.185.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.11",
+    "@types/node": "^22.15.0",
+    "@types/react": "^18.3.22",
+    "@types/react-dom": "^18.3.7",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^4.1.11",
+    "typescript": "^5.8.3"
+  }
+}
