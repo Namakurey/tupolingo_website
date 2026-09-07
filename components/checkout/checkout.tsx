@@ -169,8 +169,8 @@ export default function Checkout() {
                       key={d.id}
                       className="flex items-center justify-between gap-3 rounded-2xl border border-line bg-bg2 p-4"
                     >
-                      <div className="min-w-0">
-                        <p className="truncate text-sm font-semibold">{d.name}</p>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-semibold leading-snug">{d.name}</p>
                       </div>
                       <span className="shrink-0 text-sm font-bold">{formatIDR(d.price)}</span>
                     </div>
