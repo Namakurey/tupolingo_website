@@ -22,7 +22,7 @@ export const products: Product[] = [
   {
     id: "all-in-one",
     checkoutId: "bundle_all_in_one",
-    title: "All-in-One HSK 1-6",
+    title: "All-in-One (Dapet full akses produk HSK 1-6 + Chrome Extension)",
     hanzi: "全套",
     category: "Bundle",
     price: 99999,
