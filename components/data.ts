@@ -223,7 +223,7 @@ export const satuanTiers: PricingOption[] = [
 export const bundleTiers: PricingOption[] = [
   {
     id: "bundle_all_in_one",
-    name: "All-in-One",
+    name: "All-in-One (Dapet full akses produk HSK 1-6 + Chrome Extension)",
     hanzi: "全套",
     price: 99999,
     value: 209987,

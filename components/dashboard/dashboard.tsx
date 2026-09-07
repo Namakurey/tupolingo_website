@@ -34,7 +34,7 @@ type Bundle = {
 const BUNDLES: Bundle[] = [
   {
     id: "bundle_all_in_one",
-    name: "All-in-One",
+    name: "All-in-One (Dapet full akses produk HSK 1-6 + Chrome Extension)",
     price: 99999,
     features: ["Workbook PDF semua level", "Flashcard semua level", "ReadZhongwen Extension"],
     featured: true,
