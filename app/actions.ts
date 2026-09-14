@@ -24,8 +24,9 @@ export type AuthResult = {
 };
 
 export async function signInWithPassword(formData: FormData): Promise<AuthResult> {
+  const email = String(formData.get("email") ?? "");
   const { error } = await auth().signInWithPassword({
-    email: String(formData.get("email") ?? ""),
+    email,
     password: String(formData.get("password") ?? ""),
   });
   if (error) {
@@ -34,6 +35,12 @@ export async function signInWithPassword(formData: FormData): Promise<AuthResult
       message: error.message ?? "Gagal masuk. Periksa email dan kata sandi.",
     };
   }
+
+  // Fulfill any pending access from Lynk.id webhooks
+  fulfillPendingAccess(email).catch((err) =>
+    console.error("Failed to fulfill pending access:", err),
+  );
+
   return { error: null };
 }
 
@@ -52,6 +59,10 @@ export async function signUp(formData: FormData): Promise<AuthResult> {
     };
   }
   if (data?.requireEmailVerification) {
+    // Still fulfill pending access even with email verification
+    fulfillPendingAccess(email).catch((err) =>
+      console.error("Failed to fulfill pending access:", err),
+    );
     return {
       error: null,
       message: "Periksa email untuk kode verifikasi.",
@@ -59,7 +70,6 @@ export async function signUp(formData: FormData): Promise<AuthResult> {
   }
 
   // After successful signup, check for pending access from Lynk.id webhooks
-  // This runs asynchronously - user doesn't need to wait
   fulfillPendingAccess(email).catch((err) =>
     console.error("Failed to fulfill pending access:", err),
   );
