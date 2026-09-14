@@ -89,7 +89,7 @@ export default function Footer() {
             © {new Date().getFullYear()} TuPoLingo. All rights reserved.
           </p>
           <div className="flex items-center gap-2 text-[10px] font-semibold tracking-wide text-text3 uppercase">
-            <span className="rounded-md border border-line px-2.5 py-1">Midtrans</span>
+            <span className="rounded-md border border-line px-2.5 py-1">Lynk.id</span>
             <span className="rounded-md border border-line px-2.5 py-1">Lifetime Access</span>
           </div>
         </div>

@@ -123,7 +123,9 @@ export default function QuickViewModal({ product, onClose }: Props) {
                           </p>
                         </div>
                         <a
-                          href={`/checkout?items=${product.checkoutId}`}
+                          href="https://lynk.id/tupolingo/produk-anda"
+                          target="_blank"
+                          rel="noopener noreferrer"
                           onClick={onClose}
                           className="inline-flex items-center justify-center gap-2 rounded-full bg-accent px-7 py-3.5 text-sm font-bold text-white shadow-[0_4px_18px_rgba(225,29,72,0.35)] transition-transform hover:scale-[1.03] active:scale-[0.97]"
                         >

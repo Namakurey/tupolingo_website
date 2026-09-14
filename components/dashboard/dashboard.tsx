@@ -21,6 +21,7 @@ import FlashcardDeckPreview from "@/components/previews/flashcard-deck-preview";
 import ExtensionPreview from "@/components/previews/extension-preview";
 import { useAuth } from "@/lib/insforge/auth-provider";
 import { fetchEntitlements, fulfill, formatIDR } from "@/lib/insforge/api";
+import { insforge } from "@/lib/insforge/client";
 import type { Entitlement, Product } from "@/lib/insforge/types";
 
 type Bundle = {
@@ -146,12 +147,23 @@ export default function Dashboard() {
   const [toast, setToast] = useState<string | null>(null);
   const [level, setLevel] = useState(1);
   const [paidBanner, setPaidBanner] = useState(false);
+  const [redeemCode, setRedeemCode] = useState("");
+  const [redeemLoading, setRedeemLoading] = useState(false);
+  const [redeemError, setRedeemError] = useState<string | null>(null);
+  const [redeemSuccess, setRedeemSuccess] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     const q = new URLSearchParams(window.location.search).get("paid");
     if (q === "1") {
       setPaidBanner(true);
+      setReloadKey((k) => k + 1);
+      window.history.replaceState(null, "", "/dashboard");
+    }
+    // Check if user was just redirected after registration with pending access
+    const pending = new URLSearchParams(window.location.search).get("pending");
+    if (pending === "fulfilled") {
+      flash("Akses premium dari pembelian sebelumnya telah diaktifkan!");
       setReloadKey((k) => k + 1);
       window.history.replaceState(null, "", "/dashboard");
     }
@@ -206,6 +218,37 @@ export default function Dashboard() {
       window.open(result.store_url, "_blank", "noopener");
     } else if (ok) {
       flash(result?.message ?? "Link Chrome akan muncul segera.");
+    }
+  }
+
+  async function onRedeem() {
+    if (!redeemCode) return;
+    setRedeemLoading(true);
+    setRedeemError(null);
+    setRedeemSuccess(null);
+
+    try {
+      const { data, error } = await insforge.functions.invoke<{ ok: boolean; error?: string; message?: string; granted?: string[] }>(
+        "redeem",
+        { body: { code: redeemCode } },
+      );
+
+      if (error) {
+        setRedeemError(error.message || "Gagal mengklaim kode.");
+      } else if (data) {
+        if (data.error) {
+           setRedeemError(data.error);
+        } else {
+          setRedeemSuccess("Berhasil! Memuat ulang...");
+          setTimeout(() => {
+            window.location.reload();
+          }, 1500);
+        }
+      }
+    } catch (e) {
+      setRedeemError("Terjadi kesalahan jaringan.");
+    } finally {
+      setRedeemLoading(false);
     }
   }
 
@@ -305,6 +348,38 @@ export default function Dashboard() {
             </button>
           </motion.div>
         )}
+
+        <div className="mt-8 rounded-3xl border border-line bg-bg2 p-6">
+          <h2 className="text-[11px] font-bold tracking-[0.18em] text-text3 uppercase">
+            Kode Aktivasi
+          </h2>
+          <p className="mt-2 text-sm text-text2">
+            Beli produk di Lynk.id, lalu masukkan kode unikmu di sini.
+          </p>
+          <div className="mt-4 flex gap-2">
+            <input
+              type="text"
+              value={redeemCode}
+              onChange={(e) => setRedeemCode(e.target.value.toUpperCase())}
+              placeholder="TUPO-XXXX"
+              className="flex-1 rounded-xl border border-line bg-bg px-4 py-2.5 text-sm font-semibold tracking-wider text-text placeholder:text-text3 focus:border-accent focus:outline-none"
+            />
+            <button
+              type="button"
+              disabled={redeemLoading || !redeemCode}
+              onClick={onRedeem}
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-accent px-6 py-2.5 text-sm font-bold text-white transition-transform hover:scale-[1.02] disabled:opacity-60"
+            >
+              {redeemLoading ? <Loader2 className="size-4 animate-spin" /> : "Klaim"}
+            </button>
+          </div>
+          {redeemError && (
+            <p className="mt-3 text-sm font-medium text-accent">{redeemError}</p>
+          )}
+          {redeemSuccess && (
+            <p className="mt-3 text-sm font-medium text-emerald-500">{redeemSuccess}</p>
+          )}
+        </div>
 
         {loaded && (
           <section className="mt-10">
@@ -459,17 +534,19 @@ export default function Dashboard() {
                   <p className="mt-3 text-xl font-black">
                     {formatIDR(dbPrice ?? s.price)}
                   </p>
-                  <a
-                    href={`/checkout?items=${pid}`}
-                    aria-disabled={isOwned}
-                    className={`mt-4 inline-flex items-center justify-center gap-1.5 rounded-full px-4 py-2.5 text-sm font-semibold transition-transform hover:scale-[1.02] ${
-                      isOwned
-                        ? "pointer-events-none border border-line bg-surface text-text3"
-                        : "bg-accent text-white shadow-[0_4px_16px_rgba(225,29,72,0.35)]"
-                    }`}
-                  >
-                    {isOwned ? "Dimiliki" : "Beli"}
-                  </a>
+                   <a
+                     href={isOwned ? "#" : "https://lynk.id/tupolingo/produk-anda"}
+                     target={isOwned ? undefined : "_blank"}
+                     rel="noopener noreferrer"
+                     aria-disabled={isOwned}
+                     className={`mt-4 inline-flex items-center justify-center gap-1.5 rounded-full px-4 py-2.5 text-sm font-semibold transition-transform hover:scale-[1.02] ${
+                       isOwned
+                         ? "pointer-events-none border border-line bg-surface text-text3"
+                         : "bg-accent text-white shadow-[0_4px_16px_rgba(225,29,72,0.35)]"
+                     }`}
+                   >
+                     {isOwned ? "Dimiliki" : "Beli Sekarang"}
+                   </a>
                 </div>
               );
             })}
@@ -494,7 +571,9 @@ export default function Dashboard() {
               </div>
               <p className="mt-3 text-xl font-black">{formatIDR(29999)}</p>
               <a
-                href="/checkout?items=chrome_ext_only"
+                href={owned.has("chrome_ext_only") ? "#" : "https://lynk.id/tupolingo/produk-anda"}
+                target={owned.has("chrome_ext_only") ? undefined : "_blank"}
+                rel="noopener noreferrer"
                 aria-disabled={owned.has("chrome_ext_only")}
                 className={`mt-4 inline-flex items-center justify-center gap-1.5 rounded-full px-4 py-2.5 text-sm font-semibold transition-transform hover:scale-[1.02] ${
                   owned.has("chrome_ext_only")
@@ -502,7 +581,7 @@ export default function Dashboard() {
                     : "bg-accent text-white shadow-[0_4px_16px_rgba(225,29,72,0.35)]"
                 }`}
               >
-                {owned.has("chrome_ext_only") ? "Dimiliki" : "Beli"}
+                {owned.has("chrome_ext_only") ? "Dimiliki" : "Beli Sekarang"}
               </a>
             </div>
           </div>
@@ -550,7 +629,9 @@ export default function Dashboard() {
                     {previewsFor("bundle")}
                   </div>
                   <a
-                    href={`/checkout?items=${b.id}`}
+                    href={owned ? "#" : "https://lynk.id/tupolingo/produk-anda"}
+                    target={owned ? undefined : "_blank"}
+                    rel="noopener noreferrer"
                     aria-disabled={owned}
                     className={`mt-6 inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-bold transition-transform hover:scale-[1.02] active:scale-[0.97] ${
                       owned
@@ -569,8 +650,7 @@ export default function Dashboard() {
 
           <p className="mt-5 flex items-center gap-2 text-xs text-text3">
             <MessageCircle className="size-4 text-gold" />
-            Pembayaran diproses via Midtrans — Virtual Account, QRIS, dan metode
-            lain. Akses aktif otomatis begitu pembayaran terkonfirmasi.
+            Pembelian via Lynk.id — Klaim kode di atas untuk akses produk.
           </p>
         </section>
       </div>

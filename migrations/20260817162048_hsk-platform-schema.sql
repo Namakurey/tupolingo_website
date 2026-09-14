@@ -5,6 +5,7 @@
 CREATE TABLE public.profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   username TEXT NOT NULL,
+  is_premium BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -71,6 +72,27 @@ CREATE TABLE public.hanzi_strokes (
   medians JSONB NOT NULL
 );
 
+-- ── 9. License Keys (Lynk.id redemption) ─────────────────────────────────────
+CREATE TABLE public.license_keys (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  code TEXT UNIQUE NOT NULL,
+  is_used BOOLEAN DEFAULT FALSE,
+  redeemed_by_email TEXT,
+  redeemed_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_license_keys_code ON public.license_keys(code);
+CREATE INDEX idx_license_keys_is_used ON public.license_keys(is_used);
+
+-- ── 10. License Key to Products mapping ───────────────────────────────────────
+CREATE TABLE public.license_key_products (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  license_code TEXT REFERENCES public.license_keys(code) ON DELETE CASCADE NOT NULL,
+  product_id TEXT REFERENCES public.products(id) ON DELETE CASCADE NOT NULL,
+  UNIQUE(license_code, product_id)
+);
+
 -- ── Indexes ──────────────────────────────────────────────────────────────────
 CREATE INDEX idx_entitlements_user ON public.entitlements(user_id);
 CREATE INDEX idx_entitlements_product ON public.entitlements(product_id);
@@ -86,6 +108,8 @@ ALTER TABLE public.entitlements ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.extension_tokens ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.hanzi_data ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.hanzi_strokes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.license_keys ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.license_key_products ENABLE ROW LEVEL SECURITY;
 
 -- ── Tighten privilege surface (revoke broad DML, grant exact) ────────────────
 -- products / bundles: public read only
@@ -113,6 +137,10 @@ REVOKE ALL ON public.hanzi_strokes FROM anon, authenticated;
 -- profiles: authenticated read-all, own insert/update
 REVOKE ALL ON public.profiles FROM anon, authenticated;
 GRANT SELECT, INSERT, UPDATE ON public.profiles TO authenticated;
+
+-- license_keys: service-only (writes/reads handled by API route)
+REVOKE ALL ON public.license_keys FROM anon, authenticated;
+REVOKE ALL ON public.license_key_products FROM anon, authenticated;
 
 -- ── RLS Policies ─────────────────────────────────────────────────────────────
 

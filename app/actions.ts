@@ -39,8 +39,9 @@ export async function signInWithPassword(formData: FormData): Promise<AuthResult
 
 export async function signUp(formData: FormData): Promise<AuthResult> {
   const name = String(formData.get("name") ?? "");
+  const email = String(formData.get("email") ?? "");
   const { data, error } = await auth().signUp({
-    email: String(formData.get("email") ?? ""),
+    email,
     password: String(formData.get("password") ?? ""),
     name: name || undefined,
   });
@@ -56,6 +57,13 @@ export async function signUp(formData: FormData): Promise<AuthResult> {
       message: "Periksa email untuk kode verifikasi.",
     };
   }
+
+  // After successful signup, check for pending access from Lynk.id webhooks
+  // This runs asynchronously - user doesn't need to wait
+  fulfillPendingAccess(email).catch((err) =>
+    console.error("Failed to fulfill pending access:", err),
+  );
+
   return { error: null };
 }
 
@@ -92,4 +100,48 @@ export async function resetPassword(
     };
   }
   return { error: null };
+}
+
+// ── Fulfill pending access from Lynk.id webhooks ───────────────────────────────
+async function fulfillPendingAccess(email: string): Promise<void> {
+  const client = await createInsForgeServerClient();
+
+  // Get user ID by email (profiles.username stores email)
+  const { data: profiles } = await client.database
+    .from("profiles")
+    .select("id")
+    .eq("username", email)
+    .limit(1);
+
+  const userId = profiles?.[0]?.id;
+  if (!userId) return;
+
+  // Get all pending access for this email
+  const { data: pendingItems } = await client.database
+    .from("pending_access")
+    .select("id, product_id, transaction_id")
+    .eq("email", email)
+    .eq("status", "pending");
+
+  if (!pendingItems || pendingItems.length === 0) return;
+
+  // Grant entitlements for each pending item
+  for (const item of pendingItems) {
+    await client.database.from("entitlements").upsert(
+      { user_id: userId, product_id: item.product_id },
+      { onConflict: "user_id,product_id" },
+    );
+
+    // Mark as fulfilled
+    await client.database
+      .from("pending_access")
+      .update({ status: "fulfilled", fulfilled_at: new Date().toISOString() })
+      .eq("id", item.id);
+  }
+
+  // Set premium flag
+  await client.database
+    .from("profiles")
+    .update({ is_premium: true })
+    .eq("id", userId);
 }

@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 import { Inter, Noto_Sans_SC } from "next/font/google";
 import { AuthProvider } from "@/lib/insforge/auth-provider";
 import "./globals.css";
@@ -48,11 +47,6 @@ export default function RootLayout({
       </head>
       <body className="font-sans antialiased">
         <AuthProvider>{children}</AuthProvider>
-        <Script
-          src="https://app.sandbox.midtrans.com/snap/snap.js"
-          data-client-key="SB-Mid-client-0W43U70KKWUXDTsA"
-          strategy="afterInteractive"
-        />
       </body>
     </html>
   );

@@ -15,7 +15,6 @@ function discount(opt: PricingOption) {
 function TierCard({ opt, level }: { opt: PricingOption; level: number }) {
   const off = discount(opt);
   const hasLevel = /_L\d+$/.test(opt.id);
-  const checkoutId = hasLevel ? opt.id.replace(/_L\d+$/, `_L${level}`) : opt.id;
   const name = hasLevel ? `${opt.name} HSK ${level}` : opt.name;
   return (
     <motion.div
@@ -82,7 +81,9 @@ function TierCard({ opt, level }: { opt: PricingOption; level: number }) {
       </ul>
 
       <a
-        href={`/checkout?items=${checkoutId}`}
+        href="https://lynk.id/tupolingo/produk-anda"
+        target="_blank"
+        rel="noopener noreferrer"
         className={`mt-8 inline-flex items-center justify-center gap-2 rounded-full px-6 py-3.5 text-sm font-bold transition-transform hover:scale-[1.02] active:scale-[0.97] ${
           opt.featured
             ? "bg-accent text-white shadow-[0_6px_24px_rgba(225,29,72,0.4)]"
@@ -90,7 +91,7 @@ function TierCard({ opt, level }: { opt: PricingOption; level: number }) {
         }`}
       >
         <Zap className="size-4" />
-        {opt.featured ? "Pilih Paket Ini" : "Pilih Paket"}
+        {opt.featured ? "Beli Sekarang" : "Beli Sekarang"}
       </a>
     </motion.div>
   );
@@ -186,7 +187,7 @@ export default function Pricing() {
           </span>
           <span className="inline-flex items-center gap-2">
             <BadgePercent className="size-4 text-gold" />
-            Midtrans · Sekali bayar selamanya
+            Sekali bayar selamanya
           </span>
         </div>
       </div>

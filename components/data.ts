@@ -6,7 +6,6 @@ export type ProductCategory =
 
 export type Product = {
   id: string;
-  checkoutId: string;
   title: string;
   hanzi: string;
   category: ProductCategory;
@@ -21,7 +20,6 @@ export type Product = {
 export const products: Product[] = [
   {
     id: "all-in-one",
-    checkoutId: "bundle_all_in_one",
     title: "All-in-One (Dapet full akses produk HSK 1-6 + Chrome Extension)",
     hanzi: "全套",
     category: "Bundle",
@@ -39,7 +37,6 @@ export const products: Product[] = [
   },
   {
     id: "writing-workbook",
-    checkoutId: "writing_L1",
     title: "HSK Writing Workbook",
     hanzi: "写字",
     category: "Workbook",
@@ -57,7 +54,6 @@ export const products: Product[] = [
   },
   {
     id: "flashcards",
-    checkoutId: "flashcards_L1",
     title: "HSK Flashcards",
     hanzi: "闪卡",
     category: "Flashcards",
@@ -75,7 +71,6 @@ export const products: Product[] = [
   },
   {
     id: "writing-flashcards",
-    checkoutId: "writing_flashcards_L1",
     title: "Workbook + Flashcards",
     hanzi: "练",
     category: "Bundle",
@@ -93,7 +88,6 @@ export const products: Product[] = [
   },
   {
     id: "chrome-ext",
-    checkoutId: "chrome_ext_only",
     title: "ReadZhongwen Extension",
     hanzi: "读",
     category: "Extension",
@@ -154,7 +148,7 @@ export const faqs: Faq[] = [
   },
   {
     q: "Bagaimana cara mengakses materi setelah membeli?",
-    a: "Instan. Setelah pembayaran diverifikasi, semua materi langsung tersedia di dashboard akun Anda untuk diunduh atau diakses kapan pun.",
+    a: "Instan. Setelah pembayaran diverifikasi, masukkan kode unikmu di dashboard. Semua materi langsung tersedia untuk diunduh atau diakses kapan pun.",
   },
   {
     q: "Apakah aksesnya berbayar per bulan?",
