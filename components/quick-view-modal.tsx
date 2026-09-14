@@ -123,7 +123,17 @@ export default function QuickViewModal({ product, onClose }: Props) {
                           </p>
                         </div>
                         <a
-                          href="https://lynk.id/tupolingo/produk-anda"
+                          href={
+                            product.id === "all-in-one"
+                              ? "https://lynk.id/tupolingo/6q6121973k3k/checkout"
+                              : product.id === "chrome-ext"
+                                ? "https://lynk.id/tupolingo/k3ypg97k3vxn/checkout"
+                                : product.id === "writing-workbook"
+                                  ? "https://lynk.id/tupolingo/2wgz8kp0n48e/checkout"
+                                  : product.id === "flashcards"
+                                    ? "https://lynk.id/tupolingo/w3yj001yzylg/checkout"
+                                    : "https://lynk.id/tupolingo/2j30z281n062/checkout"
+                          }
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={onClose}

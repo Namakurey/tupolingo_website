@@ -42,6 +42,29 @@ const BUNDLES: Bundle[] = [
   },
 ];
 
+const LYNK_URLS: Record<string, string> = {
+  writing_L1: "https://lynk.id/tupolingo/2wgz8kp0n48e/checkout",
+  writing_L2: "https://lynk.id/tupolingo/zepkwwr1zvw7/checkout",
+  writing_L3: "https://lynk.id/tupolingo/vlxwjjgq4ro7/checkout",
+  writing_L4: "https://lynk.id/tupolingo/oznx995131ym/checkout",
+  writing_L5: "https://lynk.id/tupolingo/65yzlly1zped/checkout",
+  writing_L6: "https://lynk.id/tupolingo/9jpzrr7jzzxl/checkout",
+  flashcards_L1: "https://lynk.id/tupolingo/w3yj001yzylg/checkout",
+  flashcards_L2: "https://lynk.id/tupolingo/61qokjzzqkzj/checkout",
+  flashcards_L3: "https://lynk.id/tupolingo/161nq4y6nyy3/checkout",
+  flashcards_L4: "https://lynk.id/tupolingo/zlq5r8gr2rqp/checkout",
+  flashcards_L5: "https://lynk.id/tupolingo/5v947drgylgn/checkout",
+  flashcards_L6: "https://lynk.id/tupolingo/5qdx94lx2r57/checkout",
+  writing_flashcards_L1: "https://lynk.id/tupolingo/2j30z281n062/checkout",
+  writing_flashcards_L2: "https://lynk.id/tupolingo/k92rqk42k99n/checkout",
+  writing_flashcards_L3: "https://lynk.id/tupolingo/o98rgv8m9omq/checkout",
+  writing_flashcards_L4: "https://lynk.id/tupolingo/ov8r3m8p4g61/checkout",
+  writing_flashcards_L5: "https://lynk.id/tupolingo/3p7lxq7ry2jj/checkout",
+  writing_flashcards_L6: "https://lynk.id/tupolingo/q38rn28mz40p/checkout",
+  chrome_ext_only: "https://lynk.id/tupolingo/k3ypg97k3vxn/checkout",
+  bundle_all_in_one: "https://lynk.id/tupolingo/6q6121973k3k/checkout",
+};
+
 const LEVELS = [1, 2, 3, 4, 5, 6];
 
 const BUNDLE_CONTENTS: Record<string, string[]> = {
@@ -535,7 +558,7 @@ export default function Dashboard() {
                     {formatIDR(dbPrice ?? s.price)}
                   </p>
                    <a
-                     href={isOwned ? "#" : "https://lynk.id/tupolingo/produk-anda"}
+                     href={isOwned ? "#" : (LYNK_URLS[pid] ?? "https://lynk.id/tupolingo/6q6121973k3k/checkout")}
                      target={isOwned ? undefined : "_blank"}
                      rel="noopener noreferrer"
                      aria-disabled={isOwned}
@@ -571,7 +594,7 @@ export default function Dashboard() {
               </div>
               <p className="mt-3 text-xl font-black">{formatIDR(29999)}</p>
               <a
-                href={owned.has("chrome_ext_only") ? "#" : "https://lynk.id/tupolingo/produk-anda"}
+                href={owned.has("chrome_ext_only") ? "#" : LYNK_URLS.chrome_ext_only}
                 target={owned.has("chrome_ext_only") ? undefined : "_blank"}
                 rel="noopener noreferrer"
                 aria-disabled={owned.has("chrome_ext_only")}
@@ -629,7 +652,7 @@ export default function Dashboard() {
                     {previewsFor("bundle")}
                   </div>
                   <a
-                    href={owned ? "#" : "https://lynk.id/tupolingo/produk-anda"}
+                    href={owned ? "#" : LYNK_URLS[b.id]}
                     target={owned ? undefined : "_blank"}
                     rel="noopener noreferrer"
                     aria-disabled={owned}

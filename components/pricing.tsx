@@ -81,7 +81,7 @@ function TierCard({ opt, level }: { opt: PricingOption; level: number }) {
       </ul>
 
       <a
-        href="https://lynk.id/tupolingo/produk-anda"
+        href="https://lynk.id/tupolingo/6q6121973k3k/checkout"
         target="_blank"
         rel="noopener noreferrer"
         className={`mt-8 inline-flex items-center justify-center gap-2 rounded-full px-6 py-3.5 text-sm font-bold transition-transform hover:scale-[1.02] active:scale-[0.97] ${
