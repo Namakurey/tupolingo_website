@@ -185,14 +185,35 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  // 5. Find user by email
+  // 5. Find user by email - check profiles first, then auth.users
+  let userId: string | null = null;
+
   const { data: profiles } = await admin.database
     .from("profiles")
     .select("id")
-    .eq("username", email) // profiles.username stores email in this system
+    .eq("username", email)
     .limit(1);
 
-  const userId = profiles?.[0]?.id;
+  userId = profiles?.[0]?.id ?? null;
+
+  // Fallback: check auth.users if profile not found
+  if (!userId) {
+    const { data: authUsers } = await admin.database
+      .from("auth.users")
+      .select("id")
+      .eq("email", email)
+      .limit(1);
+
+    userId = authUsers?.[0]?.id ?? null;
+
+    // Create profile if user exists in auth but not in profiles
+    if (userId) {
+      await admin.database.from("profiles").upsert(
+        { id: userId, username: email, is_premium: false },
+        { onConflict: "id" },
+      );
+    }
+  }
 
   // 6. Process each item
   const grantedProducts: string[] = [];

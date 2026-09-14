@@ -74,6 +74,25 @@ export async function signUp(formData: FormData): Promise<AuthResult> {
     console.error("Failed to fulfill pending access:", err),
   );
 
+  // Create profile if not exists
+  const client = await createInsForgeServerClient();
+  const { data: existingProfile } = await client.database
+    .from("profiles")
+    .select("id")
+    .eq("username", email)
+    .limit(1);
+
+  if (!existingProfile || existingProfile.length === 0) {
+    // Get user ID from auth.users
+    const { data: authUser } = await client.auth.getCurrentUser();
+    if (authUser?.user?.id) {
+      await client.database.from("profiles").upsert(
+        { id: authUser.user.id, username: email, is_premium: false },
+        { onConflict: "id" },
+      );
+    }
+  }
+
   return { error: null };
 }
 
