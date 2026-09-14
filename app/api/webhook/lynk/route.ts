@@ -108,7 +108,7 @@ function verifyLynkSignature(
 }
 
 export async function POST(req: NextRequest) {
-  // 1. Check for duplicate transaction (idempotency)
+  // 1. Parse payload
   let payload: LynkWebhookPayload;
   try {
     payload = await req.json();
@@ -122,14 +122,16 @@ export async function POST(req: NextRequest) {
   const items = messageData.items ?? payload.items ?? [];
   const refId = messageData.ref_id ?? payload.ref_id;
 
-  if (!refId) {
-    return json({ error: "Missing ref_id" }, 400);
+  // Log all incoming webhooks for debugging
+  console.log("[LYNK_WEBHOOK] Received:", JSON.stringify(payload, null, 2));
+
+  // If this is a test/empty payload from Lynk.id, return OK (pass their test)
+  if (!refId || !customer?.email) {
+    console.log("[LYNK_WEBHOOK] Test or incomplete payload, returning OK");
+    return json({ ok: true, message: "Test received" });
   }
 
-  const email = customer?.email;
-  if (!email) {
-    return json({ error: "Missing customer email" }, 400);
-  }
+  const email = customer.email;
 
   // 2. Initialize admin client
   const admin = createAdminClient({ baseUrl: BASE_URL, apiKey: API_KEY });
