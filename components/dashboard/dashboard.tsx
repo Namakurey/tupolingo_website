@@ -21,7 +21,6 @@ import FlashcardDeckPreview from "@/components/previews/flashcard-deck-preview";
 import ExtensionPreview from "@/components/previews/extension-preview";
 import { useAuth } from "@/lib/insforge/auth-provider";
 import { fetchEntitlements, fulfill, formatIDR } from "@/lib/insforge/api";
-import { insforge } from "@/lib/insforge/client";
 import type { Entitlement, Product } from "@/lib/insforge/types";
 
 type Bundle = {
@@ -170,10 +169,6 @@ export default function Dashboard() {
   const [toast, setToast] = useState<string | null>(null);
   const [level, setLevel] = useState(1);
   const [paidBanner, setPaidBanner] = useState(false);
-  const [redeemCode, setRedeemCode] = useState("");
-  const [redeemLoading, setRedeemLoading] = useState(false);
-  const [redeemError, setRedeemError] = useState<string | null>(null);
-  const [redeemSuccess, setRedeemSuccess] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
@@ -241,37 +236,6 @@ export default function Dashboard() {
       window.open(result.store_url, "_blank", "noopener");
     } else if (ok) {
       flash(result?.message ?? "Link Chrome akan muncul segera.");
-    }
-  }
-
-  async function onRedeem() {
-    if (!redeemCode) return;
-    setRedeemLoading(true);
-    setRedeemError(null);
-    setRedeemSuccess(null);
-
-    try {
-      const { data, error } = await insforge.functions.invoke<{ ok: boolean; error?: string; message?: string; granted?: string[] }>(
-        "redeem",
-        { body: { code: redeemCode } },
-      );
-
-      if (error) {
-        setRedeemError(error.message || "Gagal mengklaim kode.");
-      } else if (data) {
-        if (data.error) {
-           setRedeemError(data.error);
-        } else {
-          setRedeemSuccess("Berhasil! Memuat ulang...");
-          setTimeout(() => {
-            window.location.reload();
-          }, 1500);
-        }
-      }
-    } catch (e) {
-      setRedeemError("Terjadi kesalahan jaringan.");
-    } finally {
-      setRedeemLoading(false);
     }
   }
 
@@ -371,38 +335,6 @@ export default function Dashboard() {
             </button>
           </motion.div>
         )}
-
-        <div className="mt-8 rounded-3xl border border-line bg-bg2 p-6">
-          <h2 className="text-[11px] font-bold tracking-[0.18em] text-text3 uppercase">
-            Kode Aktivasi
-          </h2>
-          <p className="mt-2 text-sm text-text2">
-            Beli produk di Lynk.id, lalu masukkan kode unikmu di sini.
-          </p>
-          <div className="mt-4 flex gap-2">
-            <input
-              type="text"
-              value={redeemCode}
-              onChange={(e) => setRedeemCode(e.target.value.toUpperCase())}
-              placeholder="TUPO-XXXX"
-              className="flex-1 rounded-xl border border-line bg-bg px-4 py-2.5 text-sm font-semibold tracking-wider text-text placeholder:text-text3 focus:border-accent focus:outline-none"
-            />
-            <button
-              type="button"
-              disabled={redeemLoading || !redeemCode}
-              onClick={onRedeem}
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-accent px-6 py-2.5 text-sm font-bold text-white transition-transform hover:scale-[1.02] disabled:opacity-60"
-            >
-              {redeemLoading ? <Loader2 className="size-4 animate-spin" /> : "Klaim"}
-            </button>
-          </div>
-          {redeemError && (
-            <p className="mt-3 text-sm font-medium text-accent">{redeemError}</p>
-          )}
-          {redeemSuccess && (
-            <p className="mt-3 text-sm font-medium text-emerald-500">{redeemSuccess}</p>
-          )}
-        </div>
 
         {loaded && (
           <section className="mt-10">
