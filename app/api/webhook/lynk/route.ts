@@ -20,6 +20,7 @@ type LynkItem = {
 
 type LynkMessageData = {
   ref_id?: string;
+  refId?: string;
   customer?: LynkCustomer;
   items?: LynkItem[];
   totals?: {
@@ -30,11 +31,18 @@ type LynkMessageData = {
 };
 
 type LynkWebhookPayload = {
+  event?: string;
   data?: {
+    message_action?: string;
+    message_code?: string;
     message_data?: LynkMessageData;
+    message_desc?: string;
+    message_id?: string;
+    message_title?: string;
   };
   // Alternative flat structure (some Lynk.id integrations use this)
   ref_id?: string;
+  refId?: string;
   customer?: LynkCustomer;
   items?: LynkItem[];
   total_price?: number;
@@ -57,6 +65,12 @@ const PRODUCT_NAME_MAP: Record<string, string> = {
   "Flashcards HSK 4": "flashcards_L4",
   "Flashcards HSK 5": "flashcards_L5",
   "Flashcards HSK 6": "flashcards_L6",
+  "Flashcard HSK 1": "flashcards_L1",
+  "Flashcard HSK 2": "flashcards_L2",
+  "Flashcard HSK 3": "flashcards_L3",
+  "Flashcard HSK 4": "flashcards_L4",
+  "Flashcard HSK 5": "flashcards_L5",
+  "Flashcard HSK 6": "flashcards_L6",
   // Writing Workbook
   "HSK Writing Workbook 1": "writing_L1",
   "HSK Writing Workbook 2": "writing_L2",
@@ -70,6 +84,12 @@ const PRODUCT_NAME_MAP: Record<string, string> = {
   "Writing Workbook HSK 4": "writing_L4",
   "Writing Workbook HSK 5": "writing_L5",
   "Writing Workbook HSK 6": "writing_L6",
+  "Workbook HSK 1": "writing_L1",
+  "Workbook HSK 2": "writing_L2",
+  "Workbook HSK 3": "writing_L3",
+  "Workbook HSK 4": "writing_L4",
+  "Workbook HSK 5": "writing_L5",
+  "Workbook HSK 6": "writing_L6",
   // Combo
   "Workbook + Flashcards HSK 1": "writing_flashcards_L1",
   "Workbook + Flashcards HSK 2": "writing_flashcards_L2",
@@ -77,16 +97,24 @@ const PRODUCT_NAME_MAP: Record<string, string> = {
   "Workbook + Flashcards HSK 4": "writing_flashcards_L4",
   "Workbook + Flashcards HSK 5": "writing_flashcards_L5",
   "Workbook + Flashcards HSK 6": "writing_flashcards_L6",
+  "Workbook + Flashcard HSK 1": "writing_flashcards_L1",
+  "Workbook + Flashcard HSK 2": "writing_flashcards_L2",
+  "Workbook + Flashcard HSK 3": "writing_flashcards_L3",
+  "Workbook + Flashcard HSK 4": "writing_flashcards_L4",
+  "Workbook + Flashcard HSK 5": "writing_flashcards_L5",
+  "Workbook + Flashcard HSK 6": "writing_flashcards_L6",
   // Chrome Extension
   "ReadZhongwen Chrome Extension": "chrome_ext_only",
   "ReadZhongwen Extension": "chrome_ext_only",
   "Chrome Extension ReadZhongwen": "chrome_ext_only",
+  "ReadZhongwen": "chrome_ext_only",
   // Bundles
   "All-in-One Bundle (Full HSK 1-6) + Chrome Extension": "bundle_all_in_one",
   "All-in-One Bundle": "bundle_all_in_one",
   "All-in-One": "bundle_all_in_one",
   "Paket All-in-One": "bundle_all_in_one",
   "Paket All in One": "bundle_all_in_one",
+  "All-in-One (Dapet full akses produk HSK 1-6 + Chrome Extension)": "bundle_all_in_one",
 };
 
 function json(body: unknown, status = 200) {
@@ -120,7 +148,7 @@ export async function POST(req: NextRequest) {
   const messageData = payload.data?.message_data ?? payload;
   const customer = messageData.customer ?? payload.customer;
   const items = messageData.items ?? payload.items ?? [];
-  const refId = messageData.ref_id ?? payload.ref_id;
+  const refId = messageData.ref_id ?? messageData.refId ?? payload.ref_id ?? payload.refId;
 
   // Log all incoming webhooks for debugging
   console.log("[LYNK_WEBHOOK] Received:", JSON.stringify(payload, null, 2));
